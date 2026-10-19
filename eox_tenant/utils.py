@@ -105,4 +105,7 @@ def synchronize_tenant_organizations(instance):
     for org in course_org_filter:
         organization, _ = TenantOrganization.objects.get_or_create(name=org)
         instance.organizations.add(organization)
-        Organization.objects.get_or_create(name=org, short_name=org)
+        # TitanEd: find the organization by its short name (unique), the only name that
+        # course_org_filter holds. Matching the display name too made the save fail (duplicate
+        # short name) for any organization whose name differs from its short name.
+        Organization.objects.get_or_create(short_name=org, defaults={"name": org})
